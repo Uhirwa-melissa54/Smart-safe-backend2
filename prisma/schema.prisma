@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  
+ 
+ 
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model user{
+  id        Int      @id @default(autoincrement())
+  firstName String 
+  lastName String
+  email     String?  @unique
+  password String
+  phoneNumber String @unique
+  district String
+  sector String
+  cell String
+  village String
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  refreshTokenHash String?
+  trustedContacts TrustedContacts[]
+  passwordResetOtps PasswordResetOtp[]
+}
+
+model TrustedContacts{
+   id        Int      @id @default(autoincrement())
+  fullName String 
+  relationship String
+  phoneNumber String @unique
+  district String
+  sector String
+  cell String
+  village String
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId       Int
+  user         user     @relation(fields: [userId], references: [id])
+   @@map("TrustedContancts") 
+}
+
+model PasswordResetOtp {
+  id         Int      @id @default(autoincrement())
+  otpHash    String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  userId Int
+  user   user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
